@@ -30,6 +30,7 @@
             min-height: 100px;
             line-height: 100px;
             border: 1px solid white;
+            cursor: pointer;
         }
 
         h1{
@@ -58,11 +59,24 @@
             padding: 10px;
             font-weight: bold;
         }
+
+        .isSelected{
+            color: #ef3d59;
+        }
+
+        #appointments {
+            display:none;
+        }
     </style>
-</head>
+</head> 
 <body>
     <h1>Strive Calendar</h1>
     <div id="calendar"></div>
+
+    <div id="appointments">
+        <h1>Appointments</h1>
+        <ul id="appointmentList"></ul>
+    </div>
 
     <h1>Add Meeting</h1>
     <div id="addMeeting">
@@ -86,6 +100,8 @@
     </div>
 
     <script>
+        var meetings = {}
+
         window.onload = function(){
             //we get a reference to the calendar div
             var calendar = document.querySelector("#calendar");
@@ -94,13 +110,56 @@
                 //1) create the div
                 var cell = document.createElement("div")
                 cell.className = "day"
+                cell.onclick = function(event){ //adding event handler for clicks on each day of the calendar
+                    //if a day is already selected (clicking on the same day, toggle the isSelected)
+                    if (event.currentTarget.classList.contains("isSelected")){
+                        event.currentTarget.classList.remove("isSelected")
+                        document.querySelector("#newMeetingDay").innerText = "Click on a day"
+                        return;
+                    }
+
+                    // setting the new meeting day to the selected day
+                    document.querySelector("#newMeetingDay").innerText = event.currentTarget.innerText; 
+                    var prevSelected = document.querySelector(".isSelected") //get previously selected day
+                    if (prevSelected !== null) //if there was a previously selected day
+                        prevSelected.classList.remove("isSelected"); //remove the class
+
+                    event.currentTarget.classList.add("isSelected") //in any case, add the class to the day
+                }
                 //2) add a sub element h3 to the div
                 var h3 = document.createElement("h3")
                 h3.innerText = i + 1 
                 cell.appendChild(h3)
                 //3) append both to the DOM (calendar)
                 calendar.appendChild(cell)
+
+                meetings[i+1] = [];
             }
+        }
+
+        function addMeeting(){
+            //1) get the informations from the inputs (date, time, appointmant name)
+            var meeting = {
+                day: document.querySelector("#newMeetingDay").innerText,
+                time: document.querySelector("#newMeetingTime").value,
+                name: document.querySelector("#newMeetingName").value
+            }
+            
+            if (document.querySelector(".isSelected") === null) //if no day is selected, stop execution
+                return
+            //if(parseInt(meeting.day) === Number.NaN)
+            //2) add these information in some data structure
+            // if (meetings[meeting.day] === undefined)
+            //     meetings[meeting.day] = [ meeting ]
+            // else 
+            meetings[meeting.day].push( meeting )
+
+            console.log(meetings)
+
+            //3) display the information in a specific section
+
+            //4) change the style of the day with appoints
+
         }
     
     </script>
