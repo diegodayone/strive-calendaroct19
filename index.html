@@ -200,30 +200,30 @@
                 //clear out previous appointments
                 list.innerHTML = "";
 
-                for (var i = 0; i < meetingsForTheDay.length; i ++){
-                    var li = document.createElement("li");
-                    li.innerText = meetingsForTheDay[i].time + "- " + meetingsForTheDay[i].name
-                    li.onclick = function(event){
+                for (var i = 0; i < meetingsForTheDay.length; i ++){ //loop for creating the <li>s
+                    var li = document.createElement("li"); //create an LI
+                    li.innerText = meetingsForTheDay[i].time + "- " + meetingsForTheDay[i].name //set the content
+                    li.onclick = function(event){ //delete the meeting when clicking on it
                         //1) remove the LI
                         var currentLi = event.currentTarget;
-                        var time = currentLi.innerText.split("-")[0];
+                        var time = currentLi.innerText.split("-")[0]; // get the time of the appoinment we have to delete
                         //2) remove the appointment from our meetings object
-                        var currentDay = document.querySelector("#newMeetingDay").innerText
-                        var appointments = meetings[currentDay]
-                        for (var j = 0; j < appointments.length; j++){
-                            if (appointments[j].time == time){
-                                appointments.splice(j, 1)
+                        var currentDay = document.querySelector("#newMeetingDay").innerText //in which day are we?
+                        var appointments = meetings[currentDay] //getting the array of appointments for the day
+                        for (var j = 0; j < appointments.length; j++){ //for each appointment
+                            if (appointments[j].time == time){ //if the time of this appointment is the selected time
+                                appointments.splice(j, 1) //remove it from the array
 
-                                if (appointments.length === 0){
+                                if (appointments.length === 0){ //if we have no appointments left for the day
                                     var currentDayCell = document.querySelectorAll(".day")[currentDay - 1]; //using the number to access the direct cell
-                                    currentDayCell.classList.remove("withAppointments")
+                                    currentDayCell.classList.remove("withAppointments") //remove the class
                                 }
-                                showAppointments(currentDay)
+                                showAppointments(currentDay) //update the list of appointments for today
                                 return
                             }
                         }
                     }
-                    list.appendChild(li)
+                    list.appendChild(li) //add the LI to the UL
                 }
             }
         }
