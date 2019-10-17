@@ -108,25 +108,6 @@
     <script>
         var meetings = {}
 
-        window.onload = function(){
-            //we get a reference to the calendar div
-            var calendar = document.querySelector("#calendar");
-            for(var i = 0; i < 30; i++){  //we add 30ish days to this specific calendar
-                //1) create the div
-                var cell = document.createElement("div")
-                cell.className = "day"
-                cell.onclick = onDayClick
-                //2) add a sub element h3 to the div
-                var h3 = document.createElement("h3")
-                h3.innerText = i + 1 
-                cell.appendChild(h3)
-                //3) append both to the DOM (calendar)
-                calendar.appendChild(cell)
-
-                meetings[i+1] = [];
-            }
-        }
-
         function onDayClick(event) { //adding event handler for clicks on each day of the calendar
             //if a day is already selected (clicking on the same day, toggle the isSelected)
             if (event.currentTarget.classList.contains("isSelected")){
@@ -138,6 +119,7 @@
             var selectedDay = event.currentTarget.innerText
             // setting the new meeting day to the selected day
             document.querySelector("#newMeetingDay").innerText = selectedDay; 
+            // since we want to have only a selected day at a time
             var prevSelected = document.querySelector(".isSelected") //get previously selected day
             if (prevSelected !== null) //if there was a previously selected day
                 prevSelected.classList.remove("isSelected"); //remove the class
@@ -154,13 +136,10 @@
                 name: document.querySelector("#newMeetingName").value
             }
             
-            if (document.querySelector(".isSelected") === null) //if no day is selected, stop execution
+            if (document.querySelector(".isSelected") === null)   {//if no day is selected, stop execution
+                console.log("please select a day before trying to add an event")
                 return
-            //if(parseInt(meeting.day) === Number.NaN)
-            //2) add these information in some data structure
-            // if (meetings[meeting.day] === undefined)
-            //     meetings[meeting.day] = [ meeting ]
-            // else 
+            }
 
             var isConflict = checkAppointmentConflict(meeting)
             if (!isConflict){ //if there is no conflict, I can add the appointment
@@ -195,14 +174,12 @@
         function showAppointments(day){
             var meetingsForTheDay = meetings[day]
             if (meetingsForTheDay.length === 0){ //if no appointments
-                //hide the appoints div
-                document.querySelector("#appointments").style.display = "none"
+                document.querySelector("#appointments").style.display = "none" //hide the appoints div
             }
             else {
-                document.querySelector("#appointments").style.display = "block"
+                document.querySelector("#appointments").style.display = "block" //make it visible
                 var list = document.querySelector("#appointmentList");
-                //clear out previous appointments
-                list.innerHTML = "";
+                list.innerHTML = ""; //clear out previous appointments
 
                 for (var i = 0; i < meetingsForTheDay.length; i ++){ //loop for creating the <li>s
                     var li = document.createElement("li"); //create an LI
@@ -235,6 +212,25 @@
             }
         }
     
+
+        window.onload = function(){
+            //we get a reference to the calendar div
+            var calendar = document.querySelector("#calendar");
+            for(var i = 0; i < 30; i++){  //we add 30ish days to this specific calendar
+                //1) create the div
+                var cell = document.createElement("div")
+                cell.className = "day"
+                cell.onclick = onDayClick
+                //2) add a sub element h3 to the div
+                var h3 = document.createElement("h3")
+                h3.innerText = i + 1 
+                cell.appendChild(h3)
+                //3) append both to the DOM (calendar)
+                calendar.appendChild(cell)
+
+                meetings[i+1] = [];
+            }
+        }
     </script>
 </body>
 </html>
