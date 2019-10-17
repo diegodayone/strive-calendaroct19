@@ -67,6 +67,11 @@
         #appointments {
             display:none;
         }
+
+        #calendar .withAppointments{
+            border: 1px solid #ef3d59;
+            text-decoration: underline;
+        }
     </style>
 </head> 
 <body>
@@ -75,7 +80,8 @@
 
     <div id="appointments">
         <h1>Appointments</h1>
-        <ul id="appointmentList"></ul>
+        <ul id="appointmentList">
+        </ul>
     </div>
 
     <h1>Add Meeting</h1>
@@ -118,13 +124,16 @@
                         return;
                     }
 
+                    var selectedDay = event.currentTarget.innerText
+
                     // setting the new meeting day to the selected day
-                    document.querySelector("#newMeetingDay").innerText = event.currentTarget.innerText; 
+                    document.querySelector("#newMeetingDay").innerText = selectedDay; 
                     var prevSelected = document.querySelector(".isSelected") //get previously selected day
                     if (prevSelected !== null) //if there was a previously selected day
                         prevSelected.classList.remove("isSelected"); //remove the class
 
                     event.currentTarget.classList.add("isSelected") //in any case, add the class to the day
+                    showAppointments(selectedDay)
                 }
                 //2) add a sub element h3 to the div
                 var h3 = document.createElement("h3")
@@ -152,14 +161,71 @@
             // if (meetings[meeting.day] === undefined)
             //     meetings[meeting.day] = [ meeting ]
             // else 
+
+            var meetingsForTheDay = meetings[meeting.day]
+            for (var i = 0; i < meetingsForTheDay.length; i++){
+                var prevAppTime = meetingsForTheDay[i].time;
+                var hour = prevAppTime.split(":")[0];
+                if (meeting.time.indexOf(hour + ":") === 0){
+                    console.log("already an appointment")
+                    var errorMessage = document.createElement("h2")
+                    errorMessage.innerText = "Cannot add an appointment: you have " + meetingsForTheDay[i].name + " at the same time"
+                    document.querySelector("body").appendChild(errorMessage)
+                    return;
+                }
+            }
+
             meetings[meeting.day].push( meeting )
 
             console.log(meetings)
 
             //3) display the information in a specific section
+            showAppointments(meeting.day)
 
-            //4) change the style of the day with appoints
+            //4) change the style of the day with appointments
+            var day = parseInt(meeting.day) //converting the day in a number
+            var currentDayCell = document.querySelectorAll(".day")[day - 1]; //using the number to access the direct cell
+            currentDayCell.classList.add("withAppointments"); //adding a class
+        }
 
+        function showAppointments(day){
+            var meetingsForTheDay = meetings[day]
+            if (meetingsForTheDay.length === 0){ //if no appointments
+                //hide the appoints div
+                document.querySelector("#appointments").style.display = "none"
+            }
+            else {
+                document.querySelector("#appointments").style.display = "block"
+                var list = document.querySelector("#appointmentList");
+                //clear out previous appointments
+                list.innerHTML = "";
+
+                for (var i = 0; i < meetingsForTheDay.length; i ++){
+                    var li = document.createElement("li");
+                    li.innerText = meetingsForTheDay[i].time + "- " + meetingsForTheDay[i].name
+                    li.onclick = function(event){
+                        //1) remove the LI
+                        var currentLi = event.currentTarget;
+                        var time = currentLi.innerText.split("-")[0];
+                        //2) remove the appointment from our meetings object
+                        var currentDay = document.querySelector("#newMeetingDay").innerText
+                        var appointments = meetings[currentDay]
+                        for (var j = 0; j < appointments.length; j++){
+                            if (appointments[j].time == time){
+                                appointments.splice(j, 1)
+
+                                if (appointments.length === 0){
+                                    var currentDayCell = document.querySelectorAll(".day")[currentDay - 1]; //using the number to access the direct cell
+                                    currentDayCell.classList.remove("withAppointments")
+                                }
+                                showAppointments(currentDay)
+                                return
+                            }
+                        }
+                    }
+                    list.appendChild(li)
+                }
+            }
         }
     
     </script>
